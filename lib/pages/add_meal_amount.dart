@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:kcall_app/entities/meal.dart';
 import 'package:kcall_app/helpers/db_helper.dart';
+import 'package:kcall_app/main.dart';
 
 class AddMeal_Amount extends StatefulWidget {
   late int _id;
-  
+
   AddMeal_Amount(int id) {
     _id = id;
   }
@@ -35,7 +36,7 @@ class AddMeal_AmountState extends State {
             children: [
               Flexible(
                   child: TextFormField(
-                    controller: controller,
+                controller: controller,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(hintText: "Waga posiłku w gramach"),
               ))
@@ -47,6 +48,8 @@ class AddMeal_AmountState extends State {
                 onPressed: () {
                   Meal mealToInsert = Meal(int.parse(controller.text), _id);
                   DBHelper.insertMeal(mealToInsert);
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MainPage()));
                 },
                 child: Text("Zapisz"),
               )

@@ -98,7 +98,7 @@ class DBHelper {
   static Future<List<MealToDisplay>> getMealsFromDay(String day) async {
     final db = await getDatabase();
     List<Map<String, dynamic>> maps = await db.rawQuery(
-        "SELECT m.id, m.amount, m.date, p.kcall, p.protein, p.fat, p.carbs, p.name from meals m inner join products p on m.idProduct = p.id");
+        "SELECT m.id, m.amount, m.date, p.kcall, p.protein, p.fat, p.carbs, p.name from meals m inner join products p on m.idProduct = p.id where date = '$day'");
     return List.generate(maps.length, (index) {
       return MealToDisplay.fromMap(maps[index]);
     });

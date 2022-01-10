@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kcall_app/pages/account_settings.dart';
 import 'package:kcall_app/pages/diet_statistics.dart';
+import 'package:kcall_app/pages/products_list.dart';
 
 class MyDrawer extends StatelessWidget {
   @override
@@ -20,6 +21,9 @@ class MyDrawer extends StatelessWidget {
             title: Text("Baza produktów"),
             subtitle: Text("Przeglądaj bazę produktów spożywczych "),
             leading: Icon(Icons.fastfood_outlined),
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>ProductsList()));
+            },
           ),
           ListTile(
             title: Text("Baza przepisów"),

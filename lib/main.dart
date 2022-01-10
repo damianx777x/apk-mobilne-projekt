@@ -4,9 +4,11 @@ import 'package:kcall_app/entities/meal.dart';
 import 'package:kcall_app/entities/meal_to_display.dart';
 import 'package:kcall_app/entities/weight_measurement.dart';
 import 'package:kcall_app/helpers/db_helper.dart';
+import 'package:kcall_app/pages/account_settings.dart';
 import 'package:kcall_app/pages/add_meal_category.dart';
 import 'package:kcall_app/widgets/drawer.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(KcallApp());
 
@@ -29,16 +31,15 @@ class MainPageState extends State {
   TextEditingController textEditingController = TextEditingController();
 
   Future<Widget> getPageContent() async {
+    int kcallTarget = 2000;
+    int proteinTarger = 150;
+    int fatTarget = 80;
+    int carbsTarget = 240;
 
-    int kcallTarget =2000;
-    int proteinTarger = 2000;
-    int fatTarget = 200;
-    int carbsTarget =100;
-
-    int kcall = 20;
-    int fat = 20;
-    int protein = 20;
-    int carbs = 20;
+    int kcall = 0;
+    int fat = 0;
+    int protein = 0;
+    int carbs = 0;
 
     double kcallIndicate;
     double proteinIndicate;
@@ -56,10 +57,10 @@ class MainPageState extends State {
       protein += m.protein;
       carbs += m.carbs;
     }
-    proteinIndicate = protein/proteinTarger;
-    fatIndicate = fat/fatTarget;
-    carbsIndicate = carbs/carbsTarget;
-    kcallIndicate = kcall/kcallTarget;
+    proteinIndicate = protein / proteinTarger;
+    fatIndicate = fat / fatTarget;
+    carbsIndicate = carbs / carbsTarget;
+    kcallIndicate = kcall / kcallTarget;
 
     return ListView(
       children: [
@@ -155,83 +156,105 @@ class MainPageState extends State {
   }
 
   late Future<Widget> widgets;
+  late Future<Widget> content;
 
   @override
   void initState() {
     super.initState();
+    content = checkIfUserRegistered();
     widgets = getPageContent();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Kcall App"),
-        actions: [
-          IconButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                barrierDismissible: true,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text("Pomiar wagi"),
-                    content: Form(
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          hintText: "Waga w kg",
-                        ),
-                        controller: textEditingController,
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          DBHelper.insertWeightMeasurement(
-                            WeightMeasuerement(
-                              double.parse(textEditingController.text),
-                            ),
-                          );
-                          Navigator.of(context, rootNavigator: true).pop();
-                        },
-                        child: Text("Zapisz"),
-                      )
-                    ],
-                  );
-                },
-              );
-            },
-            icon: Icon(
-              Icons.monitor_weight_outlined,
-            ),
-          )
-        ],
-      ),
-      drawer: MyDrawer(),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddMeal_Category(),
-            ),
+    return FutureBuilder(
+      future: content,
+      builder: (context, snapshot) {
+        if (snapshot.hasData)
+          return snapshot.data as Widget;
+        else
+          return Container(
+            alignment: Alignment.center,
+            child: CircularProgressIndicator(),
           );
-        },
-      ),
-      body: FutureBuilder(
-        future: widgets,
-        builder: (context, snapshot) {
-          if (snapshot.hasData)
-            return snapshot.data as Widget;
-          else
-            return Container(
-              alignment: Alignment.center,
-              child: CircularProgressIndicator(),
-            );
-        },
-      ),
+      },
     );
+  }
+
+  Future<Widget> checkIfUserRegistered() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.getBool("registered") == null) {
+      return UserSettings(isUserRegistered: false);
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Kcall App"),
+          actions: [
+            IconButton(
+              onPressed: () {
+                showDialog(
+                  context: this.context,
+                  barrierDismissible: true,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text("Pomiar wagi"),
+                      content: Form(
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: "Waga w kg",
+                          ),
+                          controller: textEditingController,
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            DBHelper.insertWeightMeasurement(
+                              WeightMeasuerement(
+                                double.parse(textEditingController.text),
+                              ),
+                            );
+                            Navigator.of(context, rootNavigator: true).pop();
+                          },
+                          child: Text("Zapisz"),
+                        )
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: Icon(
+                Icons.monitor_weight_outlined,
+              ),
+            )
+          ],
+        ),
+        drawer: MyDrawer(),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () {
+            Navigator.push(
+              this.context,
+              MaterialPageRoute(
+                builder: (context) => AddMeal_Category(),
+              ),
+            );
+          },
+        ),
+        body: FutureBuilder(
+          future: widgets,
+          builder: (context, snapshot) {
+            if (snapshot.hasData)
+              return snapshot.data as Widget;
+            else
+              return Container(
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(),
+              );
+          },
+        ),
+      );
+    }
   }
 }
