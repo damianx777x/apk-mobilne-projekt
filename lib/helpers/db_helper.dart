@@ -2,6 +2,7 @@ import 'package:kcall_app/entities/meal.dart';
 import 'package:kcall_app/entities/meal_to_display.dart';
 import 'package:kcall_app/entities/product.dart';
 import 'package:kcall_app/entities/product_category.dart';
+import 'package:kcall_app/entities/recipe.dart';
 import 'package:kcall_app/entities/weight_measurement.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -103,4 +104,13 @@ class DBHelper {
       return MealToDisplay.fromMap(maps[index]);
     });
   }
+
+  static Future<List<Recipe>> getAllRecipes() async {
+    final db = await getDatabase();
+    List<Map<String, dynamic>> maps = await db.query("recipes");
+    return List.generate(maps.length, (index) {
+      return Recipe.fromMap(maps[index]);
+    });
+    
+  } 
 }

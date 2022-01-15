@@ -4,6 +4,7 @@ import 'package:kcall_app/entities/meal.dart';
 import 'package:kcall_app/entities/meal_to_display.dart';
 import 'package:kcall_app/entities/weight_measurement.dart';
 import 'package:kcall_app/helpers/db_helper.dart';
+import 'package:kcall_app/helpers/dietetic_calculations.dart';
 import 'package:kcall_app/pages/account_settings.dart';
 import 'package:kcall_app/pages/add_meal_category.dart';
 import 'package:kcall_app/widgets/drawer.dart';
@@ -31,15 +32,39 @@ class MainPageState extends State {
   TextEditingController textEditingController = TextEditingController();
 
   Future<Widget> getPageContent() async {
-    int kcallTarget = 2000;
-    int proteinTarger = 150;
-    int fatTarget = 80;
-    int carbsTarget = 240;
+    int kcallTarget;
+    int proteinTarger;
+    int fatTarget;
+    int carbsTarget;
 
     int kcall = 0;
     int fat = 0;
     int protein = 0;
     int carbs = 0;
+
+    String name;
+    double weight;
+    Sex userSex;
+    int age;
+    int height = 160;
+    WeightTarget userWeightTarget;
+    ActivityLevel userActivityLevel;
+
+   
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  
+      name = sharedPreferences.getString("name")!;
+      weight = sharedPreferences.getDouble("weight")!;
+      age = sharedPreferences.getInt("age")!;
+      userSex = Sex.values[sharedPreferences.getInt("sex")!];
+      userWeightTarget = WeightTarget.values[sharedPreferences.getInt("goal")!];
+      userActivityLevel =
+          ActivityLevel.values[sharedPreferences.getInt("activity")!];
+
+     kcallTarget = DietCalculations.calculateDailyKcallBalance(userSex, userWeightTarget, userActivityLevel, age, weight, height);
+    proteinTarger = (kcallTarget * 20 /400).floor();
+    fatTarget = (kcallTarget * 20 /700).floor();
+    carbsTarget = (kcallTarget * 60 /400).floor();
 
     double kcallIndicate;
     double proteinIndicate;
@@ -48,7 +73,6 @@ class MainPageState extends State {
 
     DateTime dateTime = DateTime.now();
     DateFormat dateFromat = DateFormat("yyyy-MM-dd");
-    print(dateFromat.format(dateTime).toString());
     List<MealToDisplay> meals =
         await DBHelper.getMealsFromDay(dateFromat.format(dateTime).toString());
     for (MealToDisplay m in meals) {
@@ -162,7 +186,7 @@ class MainPageState extends State {
   void initState() {
     super.initState();
     content = checkIfUserRegistered();
-    widgets = getPageContent();
+    
   }
 
   @override
@@ -182,6 +206,7 @@ class MainPageState extends State {
   }
 
   Future<Widget> checkIfUserRegistered() async {
+    widgets = getPageContent();
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.getBool("registered") == null) {
       return UserSettings(isUserRegistered: false);
