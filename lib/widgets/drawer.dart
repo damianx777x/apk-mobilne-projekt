@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:kcall_app/main.dart';
 import 'package:kcall_app/pages/account_settings.dart';
 import 'package:kcall_app/pages/diet_statistics.dart';
+import 'package:kcall_app/pages/product_categories.dart';
 import 'package:kcall_app/pages/recipes_list.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -16,11 +18,27 @@ class MyDrawer extends StatelessWidget {
             title: Text("Spożycie kalorii"),
             subtitle: Text("Śledź swój dzienny bilans kaloryczny"),
             leading: Icon(Icons.food_bank),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MainPage(),
+                ),
+              );
+            },
           ),
           ListTile(
             title: Text("Baza produktów"),
             subtitle: Text("Przeglądaj bazę produktów spożywczych "),
             leading: Icon(Icons.fastfood_outlined),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductsCategoriesList(),
+                ),
+              );
+            },
           ),
           ListTile(
             title: Text("Baza przepisów"),
@@ -30,8 +48,7 @@ class MyDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => RecipesListLoader(
-                  ),
+                  builder: (context) => RecipesListLoader(),
                 ),
               );
             },

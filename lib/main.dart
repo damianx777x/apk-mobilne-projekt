@@ -167,7 +167,6 @@ class MainPageState extends State {
             shrinkWrap: true,
             itemCount: meals.length,
             itemBuilder: (context, index) {
-              print("sdds");
               return Dismissible(
                   key: UniqueKey(),
                   background: Container(
@@ -176,7 +175,6 @@ class MainPageState extends State {
                   onDismissed: (direction) {
                     DBHelper.deleteMeal(meals[index].id);
                     setState(() {
-                      print("dsasdfasdf");
                       meals.removeAt(index);
                       content = checkIfUserRegistered();
                       calculateKcall(meals);
