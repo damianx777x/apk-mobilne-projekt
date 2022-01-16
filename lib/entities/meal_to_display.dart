@@ -35,6 +35,10 @@ class MealToDisplay {
     return _amount;
   }
 
+  int get id {
+    return _id;
+  }
+
   MealToDisplay.fromMap(Map<String, dynamic> map) {
 
     _amount = map["amount"]; 

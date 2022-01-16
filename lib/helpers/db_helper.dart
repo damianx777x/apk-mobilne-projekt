@@ -113,4 +113,9 @@ class DBHelper {
     });
     
   } 
+
+  static Future<void> deleteMeal(int id) async {
+    final db = await getDatabase();
+    db.delete("meals",where: "id = $id");
+  }
 }

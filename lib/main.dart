@@ -29,6 +29,11 @@ class MainPage extends StatefulWidget {
 }
 
 class MainPageState extends State {
+  int kcall = 0;
+  int fat = 0;
+  int protein = 0;
+  int carbs = 0;
+  late List<MealToDisplay> meals;
   TextEditingController textEditingController = TextEditingController();
 
   Future<Widget> getPageContent() async {
@@ -36,11 +41,6 @@ class MainPageState extends State {
     int proteinTarger;
     int fatTarget;
     int carbsTarget;
-
-    int kcall = 0;
-    int fat = 0;
-    int protein = 0;
-    int carbs = 0;
 
     String name;
     double weight;
@@ -50,21 +50,21 @@ class MainPageState extends State {
     WeightTarget userWeightTarget;
     ActivityLevel userActivityLevel;
 
-   
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  
-      name = sharedPreferences.getString("name")!;
-      weight = sharedPreferences.getDouble("weight")!;
-      age = sharedPreferences.getInt("age")!;
-      userSex = Sex.values[sharedPreferences.getInt("sex")!];
-      userWeightTarget = WeightTarget.values[sharedPreferences.getInt("goal")!];
-      userActivityLevel =
-          ActivityLevel.values[sharedPreferences.getInt("activity")!];
 
-     kcallTarget = DietCalculations.calculateDailyKcallBalance(userSex, userWeightTarget, userActivityLevel, age, weight, height);
-    proteinTarger = (kcallTarget * 20 /400).floor();
-    fatTarget = (kcallTarget * 20 /700).floor();
-    carbsTarget = (kcallTarget * 60 /400).floor();
+    name = sharedPreferences.getString("name")!;
+    weight = sharedPreferences.getDouble("weight")!;
+    age = sharedPreferences.getInt("age")!;
+    userSex = Sex.values[sharedPreferences.getInt("sex")!];
+    userWeightTarget = WeightTarget.values[sharedPreferences.getInt("goal")!];
+    userActivityLevel =
+        ActivityLevel.values[sharedPreferences.getInt("activity")!];
+
+    kcallTarget = DietCalculations.calculateDailyKcallBalance(
+        userSex, userWeightTarget, userActivityLevel, age, weight, height);
+    proteinTarger = (kcallTarget * 20 / 400).floor();
+    fatTarget = (kcallTarget * 20 / 700).floor();
+    carbsTarget = (kcallTarget * 60 / 400).floor();
 
     double kcallIndicate;
     double proteinIndicate;
@@ -73,7 +73,7 @@ class MainPageState extends State {
 
     DateTime dateTime = DateTime.now();
     DateFormat dateFromat = DateFormat("yyyy-MM-dd");
-    List<MealToDisplay> meals =
+    meals =
         await DBHelper.getMealsFromDay(dateFromat.format(dateTime).toString());
     for (MealToDisplay m in meals) {
       kcall += m.kcall;
@@ -168,15 +168,47 @@ class MainPageState extends State {
             itemCount: meals.length,
             itemBuilder: (context, index) {
               print("sdds");
-              return ListTile(
-                title: Text(
-                    "${meals[index].name} ${meals[index].amount} g ${meals[index].kcall} kcall"),
-                subtitle: Text(
-                    "Węglowodany: ${meals[index].carbs} g Białko:  ${meals[index].protein} g Tłuszcz: ${meals[index].fat} g"),
-              );
+              return Dismissible(
+                  key: UniqueKey(),
+                  background: Container(
+                    color: Colors.red,
+                  ),
+                  onDismissed: (direction) {
+                    DBHelper.deleteMeal(meals[index].id);
+                    setState(() {
+                      print("dsasdfasdf");
+                      meals.removeAt(index);
+                      content = checkIfUserRegistered();
+                      calculateKcall(meals);
+                    });
+                  },
+                  child: ListTile(
+                    title: Text(
+                        "${meals[index].name} ${meals[index].amount} g ${meals[index].kcall} kcall"),
+                    subtitle: Text(
+                        "Węglowodany: ${meals[index].carbs} g Białko:  ${meals[index].protein} g Tłuszcz: ${meals[index].fat} g"),
+                  ));
             })
       ],
     );
+  }
+
+  void calculateKcall(List<MealToDisplay> meals) {
+    int kcall_tmp = 0;
+    int protein_tmp = 0;
+    int fat_tmp = 0;
+    int carbs_tmp = 0;
+    for (MealToDisplay m in meals) {
+      kcall_tmp += m.kcall;
+      fat_tmp += m.fat;
+      carbs_tmp += m.carbs;
+      protein_tmp += m.carbs;
+    }
+
+    kcall = kcall_tmp;
+    fat = fat_tmp;
+    carbs = carbs_tmp;
+    protein = protein_tmp;
   }
 
   late Future<Widget> widgets;
@@ -186,7 +218,6 @@ class MainPageState extends State {
   void initState() {
     super.initState();
     content = checkIfUserRegistered();
-    
   }
 
   @override
