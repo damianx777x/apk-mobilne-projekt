@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kcall_app/entities/product.dart';
 import 'package:kcall_app/helpers/db_helper.dart';
+import 'package:kcall_app/pages/edit_product.dart';
+import 'package:kcall_app/pages/product_categories.dart';
+import 'package:path/path.dart';
 
 class ShowProductDetails extends StatefulWidget {
   int _id;
@@ -13,26 +16,57 @@ class ShowProductDetails extends StatefulWidget {
 
 class _ShowProductDetailsState extends State<ShowProductDetails> {
   late Future<Widget> productDatails;
+  late Product product;
 
   Future<Widget> getProductDetails() async {
-    Product product = await DBHelper.getProductById(_id);
+    product = await DBHelper.getProductById(_id);
     return Scaffold(
       appBar: AppBar(
         title: Text(product.name),
+        actions: [
+          IconButton(
+            onPressed: () {
+               DBHelper.deleteProductById(product.id);
+              Navigator.push(this.context, MaterialPageRoute(builder: (context)=>ProductsCategoriesList()));
+            },
+            icon: Icon(Icons.delete),
+          ),
+          IconButton(
+            onPressed: () {
+             
+              Navigator.push(this.context, MaterialPageRoute(builder: (context)=>EditProduct(product)));},
+            icon: Icon(Icons.edit),
+          )
+        ],
       ),
       body: ListView(
         padding: EdgeInsetsDirectional.all(8),
         children: [
           Row(
-            children: [Text("Nazwa produktu: ${product.name}",style: TextStyle(fontWeight: FontWeight.bold))],
+            children: [
+              Text("Nazwa produktu: ${product.name}",
+                  style: TextStyle(fontWeight: FontWeight.bold))
+            ],
           ),
-          Divider(thickness: 2,),
-          Row(
-            children: [Text("Kcall w 100 g: ${product.kcall} kcall",style: TextStyle(fontWeight: FontWeight.bold))],
+          Divider(
+            thickness: 2,
           ),
-          Divider(thickness: 2,),
           Row(
-            children: [Text("Makroskładniki w 100 g produktu",style: TextStyle(fontWeight: FontWeight.bold),),],
+            children: [
+              Text("Kcall w 100 g: ${product.kcall} kcall",
+                  style: TextStyle(fontWeight: FontWeight.bold))
+            ],
+          ),
+          Divider(
+            thickness: 2,
+          ),
+          Row(
+            children: [
+              Text(
+                "Makroskładniki w 100 g produktu",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
           Row(
             children: [Text("Węglowodany: ${product.carbs} g")],

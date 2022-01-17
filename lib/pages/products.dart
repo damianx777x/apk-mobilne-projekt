@@ -21,22 +21,16 @@ class _ProductsListState extends State<ProductsList> {
         itemCount: products.length,
         itemBuilder: (context, index) {
           print(products[index].id);
-          return Dismissible(
-            child: ListTile(
-              title: Text(products[index].name),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ShowProductDetails(products[index].id),
-                  ),
-                );
-              },
-            ),
-            key: UniqueKey(),
-            onDismissed: (dissmissDirection) {
-              productsList = getProductsList(id);
+
+          return ListTile(
+            title: Text(products[index].name),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ShowProductDetails(products[index].id),
+                ),
+              );
             },
           );
         });

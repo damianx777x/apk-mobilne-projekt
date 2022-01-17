@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kcall_app/entities/product_category.dart';
 import 'package:kcall_app/helpers/db_helper.dart';
-import 'package:kcall_app/pages/add_product_select_category.dart';
-import 'package:kcall_app/pages/products.dart';
+import 'package:kcall_app/pages/add_product_insert_details.dart';
 
-class ProductsCategoriesList extends StatefulWidget {
-  const ProductsCategoriesList();
-
+class AddProductSelectCategory extends StatefulWidget {
+  AddProductSelectCategory();
   @override
-  _ProductsCategoriesListState createState() => _ProductsCategoriesListState();
+  _AddProductSelectCategoryState createState() =>
+      _AddProductSelectCategoryState();
 }
 
-class _ProductsCategoriesListState extends State<ProductsCategoriesList> {
+class _AddProductSelectCategoryState extends State<AddProductSelectCategory> {
   late Future<Widget> categoriesList;
 
   Future<Widget> getProductsCategoriesList() async {
@@ -21,16 +20,14 @@ class _ProductsCategoriesListState extends State<ProductsCategoriesList> {
       itemCount: productCategories.length,
       itemBuilder: (context, index) {
         return ListTile(
-          title: Text(productCategories[index].name),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProductsList(productCategories[index].id),
-              ),
-            );
-          },
-        );
+            title: Text(productCategories[index].name),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddProductInsertDetails(
+                          productCategories[index].id)));
+            });
       },
     );
   }
@@ -45,7 +42,7 @@ class _ProductsCategoriesListState extends State<ProductsCategoriesList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Lista produktów"),
+        title: const Text("Wybierz kategorię dla nowego produktu: "),
       ),
       body: FutureBuilder(
           future: categoriesList,
@@ -59,15 +56,6 @@ class _ProductsCategoriesListState extends State<ProductsCategoriesList> {
               );
             }
           }),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => AddProductSelectCategory()));
-        },
-        child: Icon(Icons.add),
-      ),
     );
   }
 }

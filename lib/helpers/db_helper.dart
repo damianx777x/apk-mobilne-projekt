@@ -53,6 +53,13 @@ class DBHelper {
     return db;
   }
 
+  static Future<void> insertProduct(Product product) async {
+    
+    final db = await getDatabase();
+    db.insert("products", product.toMap());
+
+  }
+
   static Future<void> insertWeightMeasurement(
       WeightMeasuerement weightMeasuerement) async {
     final db = await getDatabase();
@@ -125,4 +132,10 @@ class DBHelper {
     print(product.name);
     return product;
   }
+
+  static Future<void> deleteProductById(int id) async {
+    final db = await getDatabase();
+    await db.delete("products", where: "id = $id");
+  }
+  
 }
