@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kcall_app/entities/product.dart';
 import 'package:kcall_app/helpers/db_helper.dart';
+import 'package:kcall_app/pages/product_details.dart';
 
 class ProductsList extends StatefulWidget {
   int _id;
@@ -11,21 +12,27 @@ class ProductsList extends StatefulWidget {
 }
 
 class _ProductsListState extends State<ProductsList> {
-
-  
   int _id;
   late Future<Widget> productsList;
-
-  
 
   Future<Widget> getProductsList(int id) async {
     List<Product> products = await DBHelper.getAllProductsFromCategory(id);
     return ListView.builder(
         itemCount: products.length,
         itemBuilder: (context, index) {
+          print(products[index].id);
           return Dismissible(
             child: ListTile(
               title: Text(products[index].name),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ShowProductDetails(products[index].id),
+                  ),
+                );
+              },
             ),
             key: UniqueKey(),
             onDismissed: (dissmissDirection) {
@@ -34,8 +41,6 @@ class _ProductsListState extends State<ProductsList> {
           );
         });
   }
-
-  
 
   _ProductsListState(int id) : _id = id;
 

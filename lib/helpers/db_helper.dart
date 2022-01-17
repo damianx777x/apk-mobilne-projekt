@@ -111,11 +111,18 @@ class DBHelper {
     return List.generate(maps.length, (index) {
       return Recipe.fromMap(maps[index]);
     });
-    
-  } 
+  }
 
   static Future<void> deleteMeal(int id) async {
     final db = await getDatabase();
-    db.delete("meals",where: "id = $id");
+    db.delete("meals", where: "id = $id");
+  }
+
+  static Future<Product> getProductById(int id) async {
+    final db = await getDatabase();
+    List list = await db.query("products", limit: 1, where: "id = $id");
+    Product product = Product.fromMap(list.first as Map<String, dynamic>);
+    print(product.name);
+    return product;
   }
 }
