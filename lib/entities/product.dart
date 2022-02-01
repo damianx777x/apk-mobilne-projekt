@@ -48,6 +48,7 @@ class Product {
   int get carbs => _carbs;
   int get id => _productId;
   String get name => _name;
+  int get categoryId => _categoryId;
 
 
   Map<String, dynamic> toMap() {

@@ -1,3 +1,4 @@
+import 'package:kcall_app/entities/ingredient.dart';
 import 'package:kcall_app/entities/meal.dart';
 import 'package:kcall_app/entities/meal_to_display.dart';
 import 'package:kcall_app/entities/product.dart';
@@ -30,7 +31,21 @@ class DBHelper {
             "CREATE TABLE meals (id INTEGER PRIMARY KEY AUTOINCREMENT, idProduct INTEGER, amount INTEGER, date TEXT)");
 
         database.insert("productCategories", {"id": 1, "name": "Napoje"});
-        database.insert("productCategories", {"id": 2, "name": "Mięso"});
+        database.insert("productCategories", {"id": 2, "name": "Mięso i ryby"});
+        database.insert("productCategories", {"id": 3, "name": "Moje dania"});
+        database.insert("productCategories", {"id": 4, "name": "Produkty zbożowe, kasze, ryże"});
+        database.insert("productCategories", {"id": 5, "name": "Słodycze"});
+        database.insert("productCategories", {"id": 6, "name": "Produkty sypkie"});
+        database.insert("productCategories", {"id": 7, "name": "Tłuszcze"});
+        database.insert("productCategories", {"id": 8, "name": "Przyprawy"});
+        database.insert("productCategories", {"id": 9, "name": "Fast-food"});
+        database.insert("productCategories", {"id": 10, "name": "Dania"});
+        database.insert("productCategories", {"id": 11, "name": "Posiłki pakowane"});
+        database.insert("productCategories", {"id": 12, "name": "Warzywa"});
+        database.insert("productCategories", {"id": 13, "name": "Owoce"});
+        database.insert("productCategories", {"id": 14, "name": "Orzechy i nasiona"});
+        database.insert("productCategories", {"id": 16, "name": "Pieczywo"});
+        database.insert("productCategories", {"id": 15, "name": "Dodatki do pieczenia"});
         database.insert("products", {
           "name": "Pepsi",
           "kcall": 43,
@@ -51,6 +66,11 @@ class DBHelper {
       version: 1,
     );
     return db;
+  }
+
+  static Future<void> editProduct(Product product, int id) async {
+    final db = await getDatabase();
+    await db.update("products", product.toMap(),where: "id = $id");
   }
 
   static Future<void> insertProduct(Product product) async {
@@ -82,7 +102,7 @@ class DBHelper {
   static Future<List<ProductCategory>> getAllProductCategories() async {
     final db = await getDatabase();
     final List<Map<String, dynamic>> productCategories =
-        await db.query("productCategories");
+        await db.query("productCategories", orderBy: "name");
     return List.generate(productCategories.length, (index) {
       return ProductCategory.fromMap(productCategories[index]);
     });
@@ -137,5 +157,42 @@ class DBHelper {
     final db = await getDatabase();
     await db.delete("products", where: "id = $id");
   }
+
+  static Future<List<Map<String,dynamic>>> getDates() async {
+    final db = await getDatabase();
+    List<Map<String,dynamic>> dates = await db.rawQuery("SELECT distinct date from meals");
+    return dates;
+  }
   
+  static Future<void> insertRecipe(Map<String, dynamic> map, List<Ingredient> list) async {
+    final db = await getDatabase();
+    int id = await db.insert("recipes", map);
+    for(Ingredient i in list) {
+      i.idRecipe = id;
+      db.insert("ingredients", i.toMap());
+    }
+  }
+
+  static Future<Recipe> getRecipeById(int id) async {
+    final db = await getDatabase();
+    return Recipe.fromMap((await db.query("recipes", where: "id=$id",limit: 1)).first);
+
+  }
+
+  static Future<void> deleteRecipeById(int id) async {
+    final db = await getDatabase();
+    await db.delete("recipes", where: "id=$id");
+    await db.delete("ingredients", where: "idRecipe=$id");
+  }
+
+  static Future<List<Ingredient>> getIngredientsForRecipe(int id) async {
+    final db = await getDatabase();
+    List<Map<String, dynamic>> list = await db.query("ingredients", where: "idRecipe = $id");
+    List<Ingredient> listIngredient = <Ingredient>[];
+    for (Map<String,dynamic> map in list) {
+      listIngredient.add(Ingredient.fromMap(map));
+    } 
+    return listIngredient;
+  }
+
 }

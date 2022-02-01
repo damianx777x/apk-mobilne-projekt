@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:kcall_app/entities/add_recipe_state.dart';
 import 'package:kcall_app/entities/product.dart';
+import 'package:kcall_app/pages/add_ingredient_to_recipe.dart';
 import 'package:kcall_app/pages/add_meal_amount.dart';
+import 'package:kcall_app/widgets/ingredient_category_tile.dart';
 
 class IngredientProductTile extends StatelessWidget {
   late Product _product;
+  RecipeState? rs;
 
-  IngredientProductTile(Product product) {
+  IngredientProductTile(Product product, RecipeState? rs) {
     _product = product;
+    this.rs = rs;
   }
 
   @override
@@ -19,7 +24,7 @@ class IngredientProductTile extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AddMeal_Amount(_product.id),
+            builder: (context) => AddIngerdientAmount(rs, _product),
           ),
         );
       },

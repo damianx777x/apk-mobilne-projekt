@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kcall_app/pages/kcall_statistics.dart';
 import 'package:kcall_app/pages/weight_statistics.dart';
 
 class DietStatistics extends StatelessWidget {
@@ -23,9 +24,27 @@ class DietStatistics extends StatelessWidget {
                   );
                 },
                 child: Text("Zmiany wagi"),
-              )
+              ),
+              
             ],
-          )
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => KcallStatistics(),
+                    ),
+                  );
+                },
+                child: Text("Spożycie kcall"),
+              ),
+              
+            ],
+          ),
         ],
       ),
     );

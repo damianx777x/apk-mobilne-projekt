@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kcall_app/entities/add_recipe_state.dart';
 import 'package:kcall_app/entities/recipe.dart';
 import 'package:kcall_app/helpers/db_helper.dart';
 import 'package:kcall_app/pages/add_recipe.dart';
+import 'package:kcall_app/pages/show_recipe_details.dart';
 
 class RecipesListLoader extends StatefulWidget {
   @override
@@ -57,16 +59,26 @@ class _RecipesListState extends State<RecipesList> {
       appBar: AppBar(
         title: Text("Lista przepisów"),
       ),
+      body: ListView.builder(
+          itemCount: recipes.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+                title: Text(recipes[index].name!),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              RecipeDetails(recipes[index].id!)));
+                });
+          }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddRecipe(
-                  ),
-                ),
-              );
-            },
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddRecipe(null)),
+          );
+        },
         child: Icon(Icons.add),
       ),
     );
